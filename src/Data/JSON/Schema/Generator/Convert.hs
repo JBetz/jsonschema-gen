@@ -226,9 +226,9 @@ conAsObject' opts@(A.sumEncoding -> A.ObjectWithSingleField ) sc = conAsMap   op
 conAsObject' _opts {- @(A.sumEncoding -> A.UntaggedValue) -} _sc = error "Unsupported option"
 
 conAsTag :: A.Options -> Text -> Text ->  SchemaChoice -> A.Value
-conAsTag opts tFld cFld (SCChoiceEnum  tag _)      = object [(Key.fromText tFld, object [("enum", array [tag])]), (Key.fromText cFld, conToArray opts [])]
-conAsTag opts tFld cFld (SCChoiceArray tag _ ar)   = object [(Key.fromText tFld, object [("enum", array [tag])]), (Key.fromText cFld, conToArray opts ar)]
-conAsTag opts tFld _    (SCChoiceMap   tag _ mp _) = object ((Key.fromText tFld, object [("enum", array [tag])]) : toMap opts mp)
+conAsTag opts tFld cFld (SCChoiceEnum  tag _)      = object [(Key.fromString (A.constructorTagModifier opts $ unpack tFld), object [("enum", array [tag])]), (Key.fromText cFld, conToArray opts [])]
+conAsTag opts tFld cFld (SCChoiceArray tag _ ar)   = object [(Key.fromString (A.constructorTagModifier opts $ unpack tFld), object [("enum", array [tag])]), (Key.fromText cFld, conToArray opts ar)]
+conAsTag opts tFld _    (SCChoiceMap   tag _ mp _) = object ((Key.fromString (A.constructorTagModifier opts $ unpack tFld), object [("enum", array [tag])]) : toMap opts mp)
 
 conAsArray :: A.Options -> SchemaChoice -> A.Value
 conAsArray opts (SCChoiceEnum  tag _)       = array [object [("enum", array [tag])], conToArray  opts []]
@@ -236,9 +236,9 @@ conAsArray opts (SCChoiceArray tag _ ar)    = array [object [("enum", array [tag
 conAsArray opts (SCChoiceMap   tag _ mp rq) = array [object [("enum", array [tag])], conToObject opts mp rq]
 
 conAsMap :: A.Options -> SchemaChoice -> A.Value
-conAsMap opts (SCChoiceEnum  tag _)       = object [(Key.fromText tag, conToArray  opts [])]
-conAsMap opts (SCChoiceArray tag _ ar)    = object [(Key.fromText tag, conToArray  opts ar)]
-conAsMap opts (SCChoiceMap   tag _ mp rq) = object [(Key.fromText tag, conToObject opts mp rq)]
+conAsMap opts (SCChoiceEnum  tag _)       = object [(Key.fromString (A.constructorTagModifier opts $ unpack tag), conToArray  opts [])]
+conAsMap opts (SCChoiceArray tag _ ar)    = object [(Key.fromString (A.constructorTagModifier opts $ unpack tag), conToArray  opts ar)]
+conAsMap opts (SCChoiceMap   tag _ mp rq) = object [(Key.fromString (A.constructorTagModifier opts $ unpack tag), conToObject opts mp rq)]
 
 conToArray :: A.Options -> [Schema] -> A.Value
 conToArray opts ar = object
