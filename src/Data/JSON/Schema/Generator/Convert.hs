@@ -13,7 +13,7 @@ import Data.Monoid (mappend)
 #endif
 
 import Data.JSON.Schema.Generator.Types (Schema(..), SchemaChoice(..))
-import Data.Text (Text, pack)
+import Data.Text (Text, pack, unpack)
 
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Types as A
@@ -261,5 +261,5 @@ conToObject opts mp rq = object
     required (A.omitNothingFields -> _   ) = array . map fst $ toMap opts mp
 
 toMap :: A.Options -> [(Text,Schema)] -> [(A.Key,A.Value)]
-toMap opts mp = map (\(n,v) -> (Key.fromText n,convert' False opts v)) mp
+toMap opts mp = map (\(n,v) -> (Key.fromString (A.fieldLabelModifier opts $ unpack n) ,convert' False opts v)) mp
 
