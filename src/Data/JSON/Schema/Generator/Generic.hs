@@ -89,7 +89,7 @@ class SchemaType f where
 
 instance (Constructor c) => SchemaType (C1 c U1) where
     simpleType _ env _ = SCConst
-        { scTitle = Text.pack $ envModuleName env ++ "." ++ envDatatypeName env ++ "." ++ conname
+        { scTitle = Text.pack $ envDatatypeName env ++ "." ++ conname
         , scDescription = Nothing
         , scValue = Text.pack conname
         }
@@ -116,7 +116,7 @@ class SchemaTypeS f isRecord where
 -- Record
 instance (RecordToPairs f) => SchemaTypeS f True where
     simpleTypeS opts env _ = Tagged SCObject
-        { scTitle = Text.pack $ envModuleName env ++ "." ++ envDatatypeName env ++ "." ++ envConName env
+        { scTitle = Text.pack $ envDatatypeName env ++ "." ++ envConName env
         , scDescription = Nothing
         , scNullable = False
         , scProperties = recordToPairs opts env False (Proxy :: Proxy (f p))
@@ -127,7 +127,7 @@ instance (RecordToPairs f) => SchemaTypeS f True where
 -- Product
 instance (ProductToList f) => SchemaTypeS f False where
     simpleTypeS opts env _ = Tagged SCArray
-        { scTitle = Text.pack $ envModuleName env ++ "." ++ envDatatypeName env ++ "." ++ envConName env
+        { scTitle = Text.pack $ envConName env
         , scDescription = Nothing
         , scNullable = False
         , scItems = productToList opts env (Proxy :: Proxy (f p))
@@ -141,7 +141,7 @@ class SchemaTypeM f allNullary  where
 -- allNullary
 instance (SumToEnum f) => SchemaTypeM f True where
     simpleTypeM _ env _ = Tagged SCOneOf
-        { scTitle = Text.pack $ envModuleName env ++ "." ++ envDatatypeName env
+        { scTitle = Text.pack $ envDatatypeName env
         , scDescription = Nothing
         , scNullable = False
         , scChoices = sumToEnum env (Proxy :: Proxy (f p))
@@ -150,7 +150,7 @@ instance (SumToEnum f) => SchemaTypeM f True where
 -- not allNullary
 instance (SumToArrayOrMap f) => SchemaTypeM f False where
     simpleTypeM opts env _ = Tagged SCOneOf
-        { scTitle = Text.pack $ envModuleName env ++ "." ++ envDatatypeName env
+        { scTitle = Text.pack $ envDatatypeName env
         , scDescription = Nothing
         , scNullable = False
         , scChoices = sumToArrayOrMap opts env (Proxy :: Proxy (f p))
@@ -164,7 +164,7 @@ class SumToEnum f where
 instance (Constructor c) => SumToEnum (C1 c U1) where
     sumToEnum env _ = pure SCChoiceEnum
         { sctName = Text.pack $ conName (undefined :: C1 c U1 p)
-        , sctTitle = Text.pack $ envModuleName env ++ "." ++ envDatatypeName env ++ "."
+        , sctTitle = Text.pack $ envDatatypeName env ++ "."
                               ++ conName (undefined :: C1 c U1 p)
         }
 
@@ -196,7 +196,7 @@ class ConToArrayOrMap f isRecord where
 instance (RecordToPairs f) => ConToArrayOrMap f True where
     conToArrayOrMap opts env _ = Tagged SCChoiceMap
         { sctName = Text.pack $ envConName env
-        , sctTitle = Text.pack $ envModuleName env ++ "." ++ envDatatypeName env ++ "." ++ envConName env
+        , sctTitle = Text.pack $ envDatatypeName env ++ "." ++ envConName env
         , sctMap = recordToPairs opts env False (Proxy :: Proxy (f p))
         , sctRequired = map fst $ recordToPairs opts env True (Proxy :: Proxy (f p))
         }
@@ -204,7 +204,7 @@ instance (RecordToPairs f) => ConToArrayOrMap f True where
 instance (RecordToPairs f) => ConToArrayOrMap f False where
     conToArrayOrMap opts env _ = Tagged SCChoiceArray
         { sctName = Text.pack $ envConName env
-        , sctTitle = Text.pack $ envModuleName env ++ "." ++ envDatatypeName env ++ "." ++ envConName env
+        , sctTitle = Text.pack $ envDatatypeName env ++ "." ++ envConName env
         , sctArray = map snd $ recordToPairs opts env False (Proxy :: Proxy (f p))
         }
 
