@@ -68,10 +68,10 @@ initEnv = Env "" "" "" Nothing
 
 instance (Datatype d, SchemaType f) => GJSONSchemaGen (D1 d f) where
     gToSchema opts pd = SCSchema
-        { scId = Text.pack $ baseUri opts ++ modName ++ "." ++ typName ++ schemaIdSuffix opts
+        { scId = Text.pack $ baseUri opts ++ typName ++ schemaIdSuffix opts
         , scUsedSchema = "http://json-schema.org/draft-04/schema#"
         , scSchemaType = (simpleType opts env . fmap unM1 $ pd)
-            { scTitle = Text.pack $ modName ++ "." ++ typName
+            { scTitle = Text.pack typName
             }
         , scDefinitions = mempty
         }
